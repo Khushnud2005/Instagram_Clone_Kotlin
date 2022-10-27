@@ -1,4 +1,6 @@
 package uz.example.instaclone.activity
 
-class BaseActivity {
+import androidx.appcompat.app.AppCompatActivity
+
+open class BaseActivity :AppCompatActivity(){
 }

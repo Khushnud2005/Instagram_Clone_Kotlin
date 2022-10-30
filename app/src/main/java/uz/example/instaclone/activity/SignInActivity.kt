@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import uz.example.instaclone.R
+import uz.example.instaclone.manager.PrefsManager
 
 /**
  * In SignInActivity, user can login with email and password
@@ -28,6 +29,7 @@ class SignInActivity : AppCompatActivity() {
         val b_signin = findViewById<Button>(R.id.btn_signin)
         b_signin.setOnClickListener {
             callMainActivity()
+            PrefsManager.getInstance(this)!!.saveData("login","true")
         }
         val tv_signup = findViewById<TextView>(R.id.tv_signup)
         tv_signup.setOnClickListener { callSignUpActivity() }

@@ -17,7 +17,7 @@ import uz.example.instaclone.model.Post
  */
 class FavoriteFragment : BaseFragment() {
     val TAG = FavoriteFragment::class.java.simpleName
-    lateinit var recyclerView: RecyclerView
+    lateinit var rv_favorite: RecyclerView
     
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -27,14 +27,14 @@ class FavoriteFragment : BaseFragment() {
     }
 
     private fun initViews(view: View) {
-        recyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = GridLayoutManager(activity,1)
+        rv_favorite = view.findViewById(R.id.rv_favorite)
+        rv_favorite.layoutManager = GridLayoutManager(activity,1)
         refreshAdapter(loadPosts())
     }
 
     private fun refreshAdapter(items: ArrayList<Post>) {
         val adapter = FavoriteAdapter(this, items)
-        recyclerView.adapter = adapter
+        rv_favorite.adapter = adapter
     }
     private fun loadPosts():ArrayList<Post>{
         val items = ArrayList<Post>()

@@ -19,7 +19,7 @@ import uz.example.instaclone.model.Post
 class HomeFragment : BaseFragment() {
     val TAG = HomeFragment::class.java.simpleName
     private var listener: HomeListener? = null
-    lateinit var recyclerView:RecyclerView
+    lateinit var rv_home:RecyclerView
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
@@ -46,17 +46,17 @@ class HomeFragment : BaseFragment() {
         listener = null
     }
     private fun initViews(view: View) {
-        recyclerView = view.findViewById(R.id.recyclerView)
+        rv_home = view.findViewById(R.id.rv_home)
         val iv_camera = view.findViewById<ImageView>(R.id.iv_camera)
         iv_camera.setOnClickListener {
             listener!!.scrollToUpload()
         }
-        recyclerView.layoutManager = GridLayoutManager(activity,1)
+        rv_home.layoutManager = GridLayoutManager(activity,1)
         refreshAdapter(loadPosts())
     }
     private fun refreshAdapter(items: ArrayList<Post>) {
         val adapter = HomeAdapter(this, items)
-        recyclerView.adapter = adapter
+        rv_home.adapter = adapter
     }
     private fun loadPosts():ArrayList<Post>{
         val items = ArrayList<Post>()

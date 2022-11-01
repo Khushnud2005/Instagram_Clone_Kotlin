@@ -7,12 +7,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import uz.example.instaclone.R
+import uz.example.instaclone.manager.AuthManager
 import uz.example.instaclone.manager.PrefsManager
+import uz.example.instaclone.manager.handler.AuthHandler
+import uz.example.instaclone.utils.Extensions.toast
+import java.lang.Exception
 
 /**
  * In SignInActivity, user can login with email and password
  */
-class SignInActivity : AppCompatActivity() {
+class SignInActivity : BaseActivity() {
     val TAG = SignInActivity::class.java.simpleName
     lateinit var et_email: EditText
     lateinit var et_password: EditText
@@ -28,18 +32,35 @@ class SignInActivity : AppCompatActivity() {
         et_password = findViewById(R.id.et_passwordSI)
         val b_signin = findViewById<Button>(R.id.btn_signin)
         b_signin.setOnClickListener {
-            callMainActivity()
-            PrefsManager.getInstance(this)!!.saveData("login","true")
+            val email = et_email.text.toString().trim()
+            val password = et_password.text.toString().trim()
+            if (email.isNotEmpty()&& password.isNotEmpty()){
+                firebaseSignIn(email,password)
+            }
+
+            //PrefsManager.getInstance(this)!!.saveData("login","true")
         }
         val tv_signup = findViewById<TextView>(R.id.tv_signup)
         tv_signup.setOnClickListener { callSignUpActivity() }
 
     }
 
-    private fun callMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+    private fun firebaseSignIn(email: String, password: String) {
+        showLoading(this)
+        AuthManager.signIn(email,password,object :AuthHandler{
+            override fun onSuccess(uid: String) {
+                dismissLoading()
+                toast(getString(R.string.str_signin_success))
+                callMainActivity(context)
+            }
+
+            override fun onError(exception: Exception?) {
+                dismissLoading()
+                toast(getString(R.string.str_signin_failed))
+            }
+
+        })
+
     }
 
     private fun callSignUpActivity() {

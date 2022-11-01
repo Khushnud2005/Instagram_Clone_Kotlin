@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,6 +18,7 @@ import com.sangcomz.fishbun.FishBun
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import uz.example.instaclone.R
 import uz.example.instaclone.adapter.ProfileAdapter
+import uz.example.instaclone.manager.AuthManager
 import uz.example.instaclone.model.Post
 
 /**
@@ -30,6 +32,7 @@ class ProfileFragment : BaseFragment() {
     lateinit var tv_posts: TextView
     lateinit var tv_followers: TextView
     lateinit var tv_following: TextView
+    lateinit var iv_logOut: ImageView
     lateinit var iv_profile: ShapeableImageView
 
     var pickedPhoto: Uri? = null
@@ -49,6 +52,7 @@ class ProfileFragment : BaseFragment() {
         tv_followers = view.findViewById(R.id.tv_followers)
         tv_following = view.findViewById(R.id.tv_following)
         iv_profile = view.findViewById(R.id.iv_profile)
+        iv_logOut = view.findViewById(R.id.iv_logout)
 
         rv_profile = view.findViewById(R.id.rv_profile)
         rv_profile.setLayoutManager(GridLayoutManager(activity, 2))
@@ -57,6 +61,10 @@ class ProfileFragment : BaseFragment() {
             pickFishBunPhoto()
         }
         refreshAdapter(loadPosts())
+        iv_logOut.setOnClickListener {
+            AuthManager.signOut()
+            callSignInActivity(requireActivity())
+        }
     }
     private fun uploadUserPhoto() {
         if (pickedPhoto != null) {

@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.WindowManager
 import uz.example.instaclone.R
+import uz.example.instaclone.manager.AuthManager
 import uz.example.instaclone.manager.PrefsManager
 
 /**
  * In SplashActivity, user can visit SignInActivity or MainActivity
  */
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity() {
     val TAG = SplashActivity::class.java.simpleName
     var login:Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,9 +24,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        if (PrefsManager.getInstance(this)!!.loadData("login")=="true"){
-            login = true
-        }
+        //if (PrefsManager.getInstance(this)!!.loadData("login")=="true") login = true
         countDownTimmer()
 
     }
@@ -37,25 +36,15 @@ class SplashActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                if (login){
-                    callMainActivity()
+                if (AuthManager.isSignedIn()){
+                    callMainActivity(this@SplashActivity)
                 }else{
-                    callSignInActivity()
+                    callSignInActivity(this@SplashActivity)
                 }
             }
 
         }.start()
     }
 
-    private fun callMainActivity() {
-        val intent = Intent(this,MainActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 
-    private fun callSignInActivity() {
-        val intent = Intent(this,SignInActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 }

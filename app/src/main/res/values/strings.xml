@@ -24,5 +24,9 @@
     <string name="str_posts">Posts</string>
     <string name="str_fake_email">bayhushnud@gmail.com</string>
     <string name="str_fake_fullName">Xushnud Boymurotov</string>
+    <string name="str_signin_success">Signed in successfully</string>
+    <string name="str_signin_failed">Sign in failed</string>
+    <string name="str_signup_success">Signed up successfully</string>
+    <string name="str_signup_failed">Sign up failed</string>
 
 </resources>

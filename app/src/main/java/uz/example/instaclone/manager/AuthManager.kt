@@ -11,7 +11,7 @@ object AuthManager {
         return currentUser() != null
     }
 
-    private fun currentUser(): FirebaseUser? {
+    fun currentUser(): FirebaseUser? {
         return firebaseAuth.currentUser
     }
     fun signIn(email:String,password:String,handler: AuthHandler){

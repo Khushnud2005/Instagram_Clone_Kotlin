@@ -24,7 +24,10 @@ class SearchAdapter(var fragment: SearchFragment, var items: ArrayList<User>): B
             holder.tv_fullname.text = user.fullname
             holder.tv_email.text = user.email
 
-            var tv_follow = holder.tv_follow
+            Glide.with(fragment).load(user.userImg)
+                .placeholder(R.drawable.avatar)
+                .error(R.drawable.avatar)
+                .into(holder.iv_profile)
 
         }
     }

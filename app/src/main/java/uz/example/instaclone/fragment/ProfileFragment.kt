@@ -13,13 +13,20 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.sangcomz.fishbun.FishBun
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import uz.example.instaclone.R
+import uz.example.instaclone.activity.MainActivity
 import uz.example.instaclone.adapter.ProfileAdapter
 import uz.example.instaclone.manager.AuthManager
+import uz.example.instaclone.manager.DBManager
+import uz.example.instaclone.manager.StorageManager
+import uz.example.instaclone.manager.handler.DBUserHandler
+import uz.example.instaclone.manager.handler.StorageHandler
 import uz.example.instaclone.model.Post
+import uz.example.instaclone.model.User
 
 /**
  * In ProfileFragment, user can check his/her posts and counts and change profile photo
@@ -65,12 +72,45 @@ class ProfileFragment : BaseFragment() {
             AuthManager.signOut()
             callSignInActivity(requireActivity())
         }
+        loadUserInfo()
     }
-    private fun uploadUserPhoto() {
-        if (pickedPhoto != null) {
-            Log.d(TAG,pickedPhoto!!.path.toString())
-        }
+    private fun loadUserInfo() {
+        DBManager.loadUser(AuthManager.currentUser()!!.uid, object : DBUserHandler {
+            override fun onSuccess(user: User?) {
+                if (user != null) {
+                    showUserInfo(user)
+                }
+            }
 
+            override fun onError(e: Exception) {
+
+            }
+        })
+    }
+
+    private fun showUserInfo(user: User){
+        tv_fullname.text = user.fullname
+        tv_email.text = user.email
+        Glide.with(this).load(user.userImg)
+            .placeholder(R.drawable.avatar)
+            .error(R.drawable.avatar)
+            .into(iv_profile)
+    }
+
+    private fun uploadUserPhoto() {
+        (requireActivity() as MainActivity).showLoading(requireActivity())
+        if (pickedPhoto == null) return
+        StorageManager.uploadUserPhoto(pickedPhoto!!, object : StorageHandler {
+            override fun onSuccess(imgUrl: String) {
+                (requireActivity() as MainActivity).dismissLoading()
+                DBManager.updateUserImage(imgUrl)
+                iv_profile.setImageURI(pickedPhoto)
+            }
+
+            override fun onError(exception: Exception?) {
+                (requireActivity() as MainActivity).dismissLoading()
+            }
+        })
     }
     /**
      * Pick photo using FishBun library

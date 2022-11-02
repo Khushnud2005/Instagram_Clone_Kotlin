@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import uz.example.instaclone.R
 import uz.example.instaclone.adapter.FavoriteAdapter
 import uz.example.instaclone.adapter.SearchAdapter
+import uz.example.instaclone.manager.AuthManager
+import uz.example.instaclone.manager.DBManager
+import uz.example.instaclone.manager.handler.DBUsersHandler
 import uz.example.instaclone.model.Post
 import uz.example.instaclone.model.User
 
@@ -46,28 +49,25 @@ class SearchFragment : BaseFragment() {
                 usersByKeyword(keyword)
             }
         })
-        refreshAdapter(loadUsers())
+        loadUsers()
     }
 
     private fun refreshAdapter(items: ArrayList<User>) {
         val adapter = SearchAdapter(this, items)
         rv_serch.adapter = adapter
     }
-    private fun loadUsers():ArrayList<User>{
-        items = ArrayList<User>()
-        items.add(User("xushnud","bayhushnud@gmail.com"))
-        items.add(User("zokir","zokir@gmail.com"))
-        items.add(User("shokir","shokir@gmail.com"))
-        items.add(User("botir","botir@gmail.com"))
-        items.add(User("xushnud","bayhushnud@gmail.com"))
-        items.add(User("zokir","zokir@gmail.com"))
-        items.add(User("shokir","shokir@gmail.com"))
-        items.add(User("botir","botir@gmail.com"))
-        items.add(User("xushnud","bayhushnud@gmail.com"))
-        items.add(User("zokir","zokir@gmail.com"))
-        items.add(User("shokir","shokir@gmail.com"))
-        items.add(User("botir","botir@gmail.com"))
-        return items
+    private fun loadUsers(){
+        val uid = AuthManager.currentUser()!!.uid
+        DBManager.loadUsers(object : DBUsersHandler {
+            override fun onSuccess(users: ArrayList<User>) {
+                items.clear()
+                items.addAll(users)
+                refreshAdapter(items)
+            }
+
+            override fun onError(e: Exception) {
+            }
+        })
     }
     fun usersByKeyword(keyword: String) {
         if (keyword.isEmpty())

@@ -7,7 +7,9 @@ import android.widget.EditText
 import android.widget.TextView
 import uz.example.instaclone.R
 import uz.example.instaclone.manager.AuthManager
+import uz.example.instaclone.manager.DBManager
 import uz.example.instaclone.manager.handler.AuthHandler
+import uz.example.instaclone.manager.handler.DBUserHandler
 import uz.example.instaclone.model.User
 import uz.example.instaclone.utils.Extensions.toast
 
@@ -49,10 +51,8 @@ class SignUpActivity : BaseActivity() {
         showLoading(this)
         AuthManager.signUp(user.email, user.password, object : AuthHandler {
             override fun onSuccess(uid: String) {
-                dismissLoading()
                 user.uid = uid
-                toast(getString(R.string.str_signup_success))
-                callMainActivity(this@SignUpActivity)
+                storeUserToDB(user)
             }
 
             override fun onError(exception: Exception?) {
@@ -61,4 +61,21 @@ class SignUpActivity : BaseActivity() {
             }
         })
     }
+
+    private fun storeUserToDB(user: User){
+
+        DBManager.storeUser(user, object: DBUserHandler {
+
+            override fun onSuccess(user: User?) {
+                dismissLoading()
+                toast(getString(R.string.str_signup_success))
+                callMainActivity(context)
+            }
+
+            override fun onError(e: Exception) {
+
+            }
+        })
+    }
+
 }

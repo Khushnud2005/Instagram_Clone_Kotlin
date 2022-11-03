@@ -14,6 +14,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.sangcomz.fishbun.FishBun
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import uz.example.instaclone.R
+import uz.example.instaclone.manager.AuthManager
+import uz.example.instaclone.manager.DBManager
+import uz.example.instaclone.manager.StorageManager
+import uz.example.instaclone.manager.handler.DBPostHandler
+import uz.example.instaclone.manager.handler.DBUserHandler
+import uz.example.instaclone.manager.handler.StorageHandler
+import uz.example.instaclone.model.Post
+import uz.example.instaclone.model.User
 import uz.example.instaclone.utils.Utils
 
 /**
@@ -116,17 +124,73 @@ class UploadFragment : BaseFragment() {
         fl_photo.visibility = View.GONE
     }
     private fun uploadNewPost() {
+        showLoading(requireActivity())
         val caption = et_caption.text.toString().trim()
         if (caption.isNotEmpty() && pickedPhoto != null) {
-            listener!!.scrollToHome()
-            et_caption.text.clear()
-            allPhotos.clear()
+            uploadPostPhoto(pickedPhoto!!,caption)
         }else if (caption.isEmpty() || pickedPhoto == null){
             Utils.toast(this.requireContext(),"Please pick Photo && write Caption !!!")
         }
 
     }
 
+    private fun uploadPostPhoto(uri:Uri,caption: String) {
+        StorageManager.uploadPostPhoto(uri, object : StorageHandler {
+            override fun onSuccess(imgUrl: String) {
+                val post = Post(caption, imgUrl)
+                post.setCurrentTime()
+                val uid = AuthManager.currentUser()!!.uid
+
+                DBManager.loadUser(uid, object : DBUserHandler {
+                    override fun onSuccess(user: User?) {
+                        post.uid = uid
+                        post.fullname = user!!.fullname
+                        post.userImg = user.userImg
+                        storePostToDB(post)
+                    }
+
+                    override fun onError(e: Exception) {
+                    }
+                })
+            }
+
+            override fun onError(exception: Exception?) {
+
+            }
+        })
+    }
+
+    private fun storePostToDB(post: Post) {
+        DBManager.storePosts(post, object : DBPostHandler{
+            override fun onSuccess(post: Post) {
+                storeFeedToDB(post)
+            }
+
+            override fun onError(e: Exception) {
+                dismissLoading()
+            }
+        })
+    }
+
+    private fun storeFeedToDB(post: Post) {
+        DBManager.storeFeeds(post, object : DBPostHandler {
+            override fun onSuccess(post: Post) {
+                dismissLoading()
+                resetAll()
+                listener!!.scrollToHome()
+            }
+
+            override fun onError(e: Exception) {
+                dismissLoading()
+            }
+        })
+    }
+    private fun resetAll() {
+        allPhotos.clear()
+        et_caption.text.clear()
+        pickedPhoto = null
+        fl_photo.visibility = View.GONE
+    }
     /**
      * This interface is created for communication with HomeFragment
      */

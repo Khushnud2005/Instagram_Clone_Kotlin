@@ -23,6 +23,7 @@ import uz.example.instaclone.adapter.ProfileAdapter
 import uz.example.instaclone.manager.AuthManager
 import uz.example.instaclone.manager.DBManager
 import uz.example.instaclone.manager.StorageManager
+import uz.example.instaclone.manager.handler.DBPostsHandler
 import uz.example.instaclone.manager.handler.DBUserHandler
 import uz.example.instaclone.manager.handler.StorageHandler
 import uz.example.instaclone.model.Post
@@ -67,13 +68,29 @@ class ProfileFragment : BaseFragment() {
         iv_profile.setOnClickListener {
             pickFishBunPhoto()
         }
-        refreshAdapter(loadPosts())
+
         iv_logOut.setOnClickListener {
             AuthManager.signOut()
             callSignInActivity(requireActivity())
         }
         loadUserInfo()
+        loadMyPosts()
     }
+
+    private fun loadMyPosts() {
+        val uid = AuthManager.currentUser()!!.uid
+        DBManager.loadPosts(uid, object: DBPostsHandler {
+            override fun onSuccess(posts: ArrayList<Post>) {
+                tv_posts.text = posts.size.toString()
+                refreshAdapter(posts)
+            }
+
+            override fun onError(e: Exception) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
     private fun loadUserInfo() {
         DBManager.loadUser(AuthManager.currentUser()!!.uid, object : DBUserHandler {
             override fun onSuccess(user: User?) {
@@ -137,16 +154,5 @@ class ProfileFragment : BaseFragment() {
         rv_profile.adapter = adapter
     }
 
-    private fun loadPosts():ArrayList<Post>{
-        val items = ArrayList<Post>()
-        items.add(Post("https://images.unsplash.com/photo-1657214058650-31cc8400713b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1664575196044-195f135295df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwyMXx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1509395286499-2d94a9e0c814?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHBob25lfGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1665436752144-4e9236563aff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHx0b3BpYy1mZWVkfDEyMHw2c01WalRMU2tlUXx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1657214058650-31cc8400713b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1664575196044-195f135295df?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwyMXx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1509395286499-2d94a9e0c814?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHBob25lfGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=600&q=60"))
-        items.add(Post("https://images.unsplash.com/photo-1665436752144-4e9236563aff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHx0b3BpYy1mZWVkfDEyMHw2c01WalRMU2tlUXx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=600&q=60"))
-        return items
-    }
+
 }
